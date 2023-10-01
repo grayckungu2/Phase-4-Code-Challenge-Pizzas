@@ -5,10 +5,12 @@ function RestaurantList() {
   const [restaurants, setRestaurants] = useState([]);
   const [searchId, setSearchId] = useState(''); // State to store the search ID
 
+  // Fetch restaurants when the component is mounted
   useEffect(() => {
     fetchRestaurants();
   }, []);
 
+  // Function to fetch the list of restaurants
   const fetchRestaurants = async () => {
     try {
       const response = await fetch('http://127.0.0.1:5000/restaurants');
@@ -23,6 +25,25 @@ function RestaurantList() {
     }
   };
 
+  // Function to handle searching for a restaurant by its ID
+  const handleSearch = async () => {
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/restaurants/${searchId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setRestaurants([data]); // Replace the restaurant list with the single result
+      } else if (response.status === 404) {
+        console.error('Restaurant not found');
+        setRestaurants([]); // Clear the restaurant list
+      } else {
+        console.error('Error fetching restaurant by ID:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching restaurant by ID:', error);
+    }
+  };
+
+  // Function to handle deleting a restaurant by its ID
   const handleDeleteRestaurant = async (id) => {
     try {
       const response = await fetch(`http://127.0.0.1:5000/restaurants/${id}`, {
@@ -42,23 +63,6 @@ function RestaurantList() {
     }
   };
 
-  const handleSearch = async () => {
-    try {
-      const response = await fetch(`http://127.0.0.1:5000/restaurants/${searchId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setRestaurants([data]); // Replace the restaurant list with the single result
-      } else if (response.status === 404) {
-        console.error('Restaurant not found');
-        setRestaurants([]); // Clear the restaurant list
-      } else {
-        console.error('Error fetching restaurant by ID:', response.statusText);
-      }
-    } catch (error) {
-      console.error('Error fetching restaurant by ID:', error);
-    }
-  };
-
   return (
     <div>
       <h1>Restaurant List</h1>
@@ -71,14 +75,33 @@ function RestaurantList() {
         />
         <button onClick={handleSearch}>Search</button>
       </div>
-      <ul>
-        {restaurants.map((restaurant) => (
-          <li key={restaurant.id}>
-            <Link to={`/restaurants/${restaurant.id}`}>{restaurant.name}</Link>
-            <button onClick={() => handleDeleteRestaurant(restaurant.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {restaurants.map((restaurant) => (
+            <tr key={restaurant.id}>
+              <td>
+                <Link to={`/restaurants/${restaurant.id}`}>{restaurant.name}</Link>
+              </td>
+              <td>{restaurant.address}</td>
+              <td>
+                <button
+                  onClick={() => handleDeleteRestaurant(restaurant.id)}
+                  style={{ backgroundColor: 'red', color: 'white' }}
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
