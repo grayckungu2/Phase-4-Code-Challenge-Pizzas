@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 
 function RestaurantList() {
   const [restaurants, setRestaurants] = useState([]);
-  const [searchId, setSearchId] = useState(''); // State to store the search ID
+  const [searchId, setSearchId] = useState('');
 
-  // Fetch restaurants when the component is mounted
+  // Fetch restaurants 
   useEffect(() => {
     fetchRestaurants();
   }, []);
@@ -31,10 +31,10 @@ function RestaurantList() {
       const response = await fetch(`http://127.0.0.1:5000/restaurants/${searchId}`);
       if (response.ok) {
         const data = await response.json();
-        setRestaurants([data]); // Replace the restaurant list with the single result
+        setRestaurants([data]); 
       } else if (response.status === 404) {
         console.error('Restaurant not found');
-        setRestaurants([]); // Clear the restaurant list
+        setRestaurants([]); 
       } else {
         console.error('Error fetching restaurant by ID:', response.statusText);
       }
